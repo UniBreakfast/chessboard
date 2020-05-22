@@ -8,13 +8,15 @@ const figures = {
 };
 let state = [];
 const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
+formState(startPos);
+setFigures();
+let turn = "white";
+setReady();
 
-function formState(posStr) {}
-
-function build(str) {
+function formState(posStr) {
   state = [];
   let row = [];
-  for (const char of str) {
+  for (const char of posStr) {
     const figure = {};
     if ("RNBKQP".includes(char)) figure.color = "white";
     else if ("rnbkqp".includes(char)) figure.color = "black";
@@ -48,39 +50,61 @@ function setFigure(row, col, figure) {
   board.rows[row].cells[col + 1].innerText = char;
 }
 
-function fill(i, hue) {
-  i = ((i - 1) % 36) + 1;
-  const color = `hsl(${hue} 85% 90%)`;
-  const table = board.parentElement;
-  if (i <= 10) {
-    table.rows[0].cells[i - 1].style.background = color;
-  } else if (i < 19) {
-    board.rows[i - 11].cells[9].style.background = color;
-  } else if (i <= 28) {
-    table.rows[9].cells[28 - i].style.background = color;
-  } else {
-    board.rows[36 - i].cells[0].style.background = color;
-  }
+function setFigures() {
+  state.forEach((row, i) => {
+    row.forEach((figure, j) => setFigure(i, j, figure));
+  });
+  // for (let i = 0; i < 8; i++) {
+  //   for (let j = 0; j < 8; j++) setFigure(i, j, state[i][j])
+  // }
 }
 
-for (let i = 1; i <= 1e3; i++) {
-  setTimeout(fill, 20 * i, i, i);
+function setReady() {
+  board
+    .querySelectorAll(".ready")
+    .forEach((cell) => cell.classList.remove("ready"));
+  state.forEach((row, i) =>
+    row.forEach((figure, j) => {
+      if (figure?.color == turn) {
+        board.rows[i].cells[j + 1].classList.add("ready");
+      }
+    })
+  );
 }
 
-function write(i, letter) {
-  i = ((i - 1) % 36) + 1;
-  const table = board.parentElement;
-  if (i <= 10) {
-    table.rows[0].cells[i - 1].innerText = letter;
-  } else if (i < 19) {
-    board.rows[i - 11].cells[9].innerText = letter;
-  } else if (i <= 28) {
-    table.rows[9].cells[28 - i].innerText = letter;
-  } else {
-    board.rows[36 - i].cells[0].innerText = letter;
-  }
-}
+// function fill(i, hue) {
+//   i = ((i - 1) % 36) + 1;
+//   const color = `hsl(${hue} 85% 90%)`;
+//   const table = board.parentElement;
+//   if (i <= 10) {
+//     table.rows[0].cells[i - 1].style.background = color;
+//   } else if (i < 19) {
+//     board.rows[i - 11].cells[9].style.background = color;
+//   } else if (i <= 28) {
+//     table.rows[9].cells[28 - i].style.background = color;
+//   } else {
+//     board.rows[36 - i].cells[0].style.background = color;
+//   }
+// }
 
-for (let i = 1; i < 1e3; i++) {
-  setTimeout(write, 500 * i, i, i);
-}
+// for (let i = 1; i <= 1e3; i++) {
+//   setTimeout(fill, 20 * i, i, i);
+// }
+
+// function write(i, letter) {
+//   i = ((i - 1) % 36) + 1;
+//   const table = board.parentElement;
+//   if (i <= 10) {
+//     table.rows[0].cells[i - 1].innerText = letter;
+//   } else if (i < 19) {
+//     board.rows[i - 11].cells[9].innerText = letter;
+//   } else if (i <= 28) {
+//     table.rows[9].cells[28 - i].innerText = letter;
+//   } else {
+//     board.rows[36 - i].cells[0].innerText = letter;
+//   }
+// }
+
+// for (let i = 1; i < 1e3; i++) {
+//   setTimeout(write, 500 * i, i, i);
+// }
