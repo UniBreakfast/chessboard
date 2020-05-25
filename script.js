@@ -6,6 +6,12 @@ const figures = {
   queen: { empty: "♕", filled: "♛" },
   pawn: { empty: "♙", filled: "♟" },
 };
+board
+  .querySelectorAll("td")
+  .forEach((cell) => (cell.onclick = () => setActive(cell)));
+document.body.onclick = (e) => {
+  if (e.target == document.body) setReady();
+};
 let state = [];
 const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
@@ -61,8 +67,8 @@ function setFigures() {
 
 function setReady() {
   board
-    .querySelectorAll(".ready")
-    .forEach((cell) => cell.classList.remove("ready"));
+    .querySelectorAll(".ready, .active")
+    .forEach((cell) => cell.classList.remove("ready", "active"));
   state.forEach((row, i) =>
     row.forEach((figure, j) => {
       if (figure?.color == turn) {
@@ -72,6 +78,26 @@ function setReady() {
   );
 }
 
+function setActive(cell) {
+  if (cell.classList.contains("ready")) {
+    board
+      .querySelectorAll(".ready")
+      .forEach((cell) => cell.classList.remove("ready"));
+    cell.classList.add("active");
+  }
+}
+
+function getFigure(cell) {
+  const col = cell.cellIndex - 1;
+  const row = cell.parentElement.rowIndex - 1;
+  return state[row][col];
+}
+
+function getMoves(cell) {
+  const figure = getFigure(cell);
+  if (figure.name == "pawn") {
+  }
+}
 // function fill(i, hue) {
 //   i = ((i - 1) % 36) + 1;
 //   const color = `hsl(${hue} 85% 90%)`;

@@ -36,6 +36,11 @@ td {
   line-height: 0;
 }
 
+.active {
+  text-shadow: 0 0 2px lime;
+  box-shadow: inset 0 0 3px 2px lime;
+}
+
 .ready {
   text-shadow: 0 0 2px gold;
   box-shadow: inset 0 0 3px 2px gold;
