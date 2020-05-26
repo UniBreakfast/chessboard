@@ -1,6 +1,8 @@
 body {
+  font-family: "Chelsea Market", cursive;
   display: flex;
-  background: #460404;
+  background: url("../img/wooden-bg.jpg") center no-repeat;
+  background-size: cover;
   margin: 0;
   height: 100vh;
 }
@@ -8,11 +10,14 @@ body {
 table {
   margin: auto;
   border-collapse: collapse;
+  box-shadow: 2px 5px 15px 22px rgba(80, 40, 0, 1.9);
 }
 
 th {
-  background: cornsilk;
-  color: #460404;
+  /* background: cornsilk; */
+  background: url("../img/dark-bg.jpg");
+  /* color: #460404; */
+  color: #ae6f2b;
   font-size: 20px;
 }
 
@@ -37,8 +42,9 @@ td {
 }
 
 .active {
-  text-shadow: 0 0 2px lime;
-  box-shadow: inset 0 0 3px 2px lime;
+  /* text-shadow: 0 0 2px #9effb1;
+  box-shadow: inset 0 0 3px 2px #9effb1; */
+  box-shadow: inset 0px 0px 14px 5px rgba(154, 227, 90, 1);
 }
 
 .ready {
