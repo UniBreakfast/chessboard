@@ -11,6 +11,7 @@ table {
   margin: auto;
   border-collapse: collapse;
   box-shadow: 2px 5px 15px 22px rgba(80, 40, 0, 1.9);
+  cursor: pointer;
 }
 
 th {
@@ -41,15 +42,19 @@ td {
   line-height: 0;
 }
 
+.ready {
+  text-shadow: 0 0 2px gold;
+  box-shadow: inset 0 0 3px 2px gold;
+}
+
 .active {
   /* text-shadow: 0 0 2px #9effb1;
   box-shadow: inset 0 0 3px 2px #9effb1; */
   box-shadow: inset 0px 0px 14px 5px rgba(154, 227, 90, 1);
 }
 
-.ready {
-  text-shadow: 0 0 2px gold;
-  box-shadow: inset 0 0 3px 2px gold;
+.move {
+  box-shadow: inset 0px 0px 14px 5px rgba(154, 227, 90, 1);
 }
 
 thead th {

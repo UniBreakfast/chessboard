@@ -13,10 +13,11 @@ document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
 let state = [];
-const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
+const startPos = "RNBKQBNR/PPPPPPPP/2p1P/6p1/6p1/2p1P/pppppppp/rnbkqbnr";
+// const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
-let turn = "white";
+let turn = "black";
 setReady();
 
 function formState(posStr) {
@@ -81,23 +82,87 @@ function setReady() {
 function setActive(cell) {
   if (cell.classList.contains("ready")) {
     board
-      .querySelectorAll(".ready")
-      .forEach((cell) => cell.classList.remove("ready"));
+      .querySelectorAll(".move, .active")
+      .forEach((cell) => cell.classList.remove("move", "active"));
     cell.classList.add("active");
+    getMoves(cell).forEach((cell) => cell.classList.add("move"));
   }
 }
 
 function getFigure(cell) {
   const col = cell.cellIndex - 1;
-  const row = cell.parentElement.rowIndex - 1;
+  const row = cell.rowIndex - 1;
   return state[row][col];
 }
 
 function getMoves(cell) {
   const figure = getFigure(cell);
-  if (figure.name == "pawn") {
+  return [...board.querySelectorAll("td")].filter((td) =>
+    canMoveThere(figure, cell, td)
+  );
+}
+
+function canMoveThere(figure, from, to) {
+  if (getFigure(to)?.color == figure.color) return;
+  switch (figure.name) {
+    case "pawn":
+      if (figure.color == "white") {
+        if (
+          getFigure(to) &&
+          Math.abs(to.cellIndex - from.cellIndex) == 1 &&
+          to.rowIndex - from.rowIndex == 1
+        )
+          return true;
+        if (
+          !getFigure(to) &&
+          to.cellIndex == from.cellIndex &&
+          to.rowIndex - from.rowIndex == 1
+        )
+          return true;
+        if (
+          !getFigure(to) &&
+          to.cellIndex == from.cellIndex &&
+          to.rowIndex == 4 &&
+          from.rowIndex == 2 &&
+          !getFigure(board.rows[2].cells[to.cellIndex])
+        )
+          return true;
+      }
+      if (figure.color == "black") {
+        if (
+          getFigure(to) &&
+          Math.abs(to.cellIndex - from.cellIndex) == 1 &&
+          from.rowIndex - to.rowIndex == 1
+        )
+          return true;
+        if (
+          !getFigure(to) &&
+          to.cellIndex == from.cellIndex &&
+          from.rowIndex - to.rowIndex == 1
+        )
+          return true;
+        if (
+          !getFigure(to) &&
+          to.cellIndex == from.cellIndex &&
+          to.rowIndex == 5 &&
+          from.rowIndex == 7 &&
+          !getFigure(board.rows[5].cells[to.cellIndex])
+        )
+          return true;
+      }
+      break;
+    case "rook":
+      break;
+    case "knight":
+      break;
+    case "bishop":
+      break;
+    case "king":
+      break;
+    case "queen":
   }
 }
+
 // function fill(i, hue) {
 //   i = ((i - 1) % 36) + 1;
 //   const color = `hsl(${hue} 85% 90%)`;
