@@ -1,7 +1,7 @@
 body {
   font-family: "Chelsea Market", cursive;
   display: flex;
-  background: url("../img/wooden-bg.jpg") center no-repeat;
+  background: url("img/wooden-bg.jpg") center no-repeat;
   background-size: cover;
   margin: 0;
   height: 100vh;
@@ -16,7 +16,7 @@ table {
 
 th {
   /* background: cornsilk; */
-  background: url("../img/dark-bg.jpg");
+  background: url("img/dark-bg.jpg");
   /* color: #460404; */
   color: #ae6f2b;
   font-size: 20px;

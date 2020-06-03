@@ -13,11 +13,11 @@ document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
 let state = [];
-const startPos = "RNBKQBNR/PPPPPPPP/2p1P/6p1/6p1/2p1P/pppppppp/rnbkqbnr";
+const startPos = "1NBK1BNR/R7/4Q3/8/3n4/8/8/rnbkqbnr";
 // const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
-let turn = "black";
+let turn = 0 ? "white" : "black";
 setReady();
 
 function formState(posStr) {
@@ -103,63 +103,81 @@ function getMoves(cell) {
 }
 
 function canMoveThere(figure, from, to) {
-  if (getFigure(to)?.color == figure.color) return;
+  if (from == to || getFigure(to)?.color == figure.color) return;
+  const rows = Math.abs(to.rowIndex - from.rowIndex);
+  const cols = Math.abs(to.cellIndex - from.cellIndex);
   switch (figure.name) {
     case "pawn":
       if (figure.color == "white") {
         if (
-          getFigure(to) &&
-          Math.abs(to.cellIndex - from.cellIndex) == 1 &&
-          to.rowIndex - from.rowIndex == 1
-        )
-          return true;
-        if (
-          !getFigure(to) &&
-          to.cellIndex == from.cellIndex &&
-          to.rowIndex - from.rowIndex == 1
-        )
-          return true;
-        if (
-          !getFigure(to) &&
-          to.cellIndex == from.cellIndex &&
-          to.rowIndex == 4 &&
-          from.rowIndex == 2 &&
-          !getFigure(board.rows[2].cells[to.cellIndex])
+          (getFigure(to) && cols == 1 && to.rowIndex - from.rowIndex == 1) ||
+          (!getFigure(to) && !cols && to.rowIndex - from.rowIndex == 1) ||
+          (!getFigure(to) &&
+            !cols &&
+            to.rowIndex == 4 &&
+            from.rowIndex == 2 &&
+            isLineFree(from, to))
         )
           return true;
       }
       if (figure.color == "black") {
         if (
-          getFigure(to) &&
-          Math.abs(to.cellIndex - from.cellIndex) == 1 &&
-          from.rowIndex - to.rowIndex == 1
-        )
-          return true;
-        if (
-          !getFigure(to) &&
-          to.cellIndex == from.cellIndex &&
-          from.rowIndex - to.rowIndex == 1
-        )
-          return true;
-        if (
-          !getFigure(to) &&
-          to.cellIndex == from.cellIndex &&
-          to.rowIndex == 5 &&
-          from.rowIndex == 7 &&
-          !getFigure(board.rows[5].cells[to.cellIndex])
+          (getFigure(to) && cols == 1 && from.rowIndex - to.rowIndex == 1) ||
+          (!getFigure(to) && !cols && from.rowIndex - to.rowIndex == 1) ||
+          (!getFigure(to) &&
+            !cols &&
+            to.rowIndex == 5 &&
+            from.rowIndex == 7 &&
+            isLineFree(from, to))
         )
           return true;
       }
       break;
     case "rook":
+      if (from.cellIndex == to.cellIndex || from.rowIndex == to.rowIndex)
+        return isLineFree(from, to);
       break;
     case "knight":
+      if ((rows == 2 && cols == 1) || (cols == 2 && rows == 1)) return true;
       break;
     case "bishop":
+      if (
+        Math.abs(to.cellIndex - from.cellIndex) ==
+        Math.abs(to.rowIndex - from.rowIndex)
+      )
+        return isLineFree(from, to);
       break;
     case "king":
+      if (rows + cols <= 2 && rows != 2 && cols != 2) return true;
       break;
     case "queen":
+      return isLineFree(from, to);
+  }
+}
+
+function isLineFree(from, to) {
+  if (
+    from.cellIndex == to.cellIndex ||
+    from.rowIndex == to.rowIndex ||
+    Math.abs(to.cellIndex - from.cellIndex) ==
+      Math.abs(to.rowIndex - from.rowIndex)
+  ) {
+    const colStep =
+      to.cellIndex == from.cellIndex
+        ? 0
+        : to.cellIndex > from.cellIndex
+        ? 1
+        : -1;
+    const rowStep =
+      to.rowIndex == from.rowIndex ? 0 : to.rowIndex > from.rowIndex ? 1 : -1;
+    for (
+      let i = from.cellIndex + colStep, j = from.rowIndex + rowStep;
+      i != to.cellIndex || j != to.rowIndex;
+      i += colStep, j += rowStep
+    ) {
+      if (getFigure(board.rows[j - 1].cells[i])) return false;
+    }
+    return true;
   }
 }
 
