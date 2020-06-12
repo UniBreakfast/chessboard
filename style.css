@@ -93,3 +93,30 @@ td {
   line-height: 0;
   box-sizing: border-box;
 }
+
+.undo {
+  background: url(img/back.png) center no-repeat;
+  padding: 20px;
+}
+
+.redo {
+  background: url(img/next.png) center no-repeat;
+  padding: 18.5px;
+}
+
+.btn {
+  background-size: cover;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:hover {
+  border: gold;
+  outline: none;
+}
+
+.btns {
+  position: absolute;
+  top: 20%;
+  left: 47.5%;
+}

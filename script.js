@@ -17,7 +17,9 @@ const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 // const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
-let turn = 1 ? "white" : "black";
+let activePlayer = 1 ? "white" : "black";
+let turn = 0;
+const boardHistory = [JSON.stringify(state)];
 setReady();
 
 function formState(posStr) {
@@ -72,7 +74,7 @@ function setReady() {
     .forEach((cell) => cell.classList.remove("ready", "active", "move"));
   state.forEach((row, i) =>
     row.forEach((figure, j) => {
-      if (figure?.color == turn) {
+      if (figure?.color == activePlayer) {
         board.rows[i].cells[j + 1].classList.add("ready");
       }
     })
@@ -91,8 +93,10 @@ function handleClick(cell) {
   if (cell.classList.contains("ready")) setActive(cell);
   else if (cell.classList.contains("move")) {
     moveFigure(board.querySelector(".active"), cell);
-    turn = turn == "white" ? "black" : "white";
+    boardHistory.push(JSON.stringify(state));
+    activePlayer = activePlayer == "white" ? "black" : "white";
     setReady();
+    turn++;
   }
 }
 
@@ -199,6 +203,31 @@ function isLineFree(from, to) {
     return true;
   }
 }
+
+function undo() {
+  if (turn) {
+    turn--;
+    state = JSON.parse(boardHistory[turn]);
+    setFigures();
+    activePlayer = activePlayer == "white" ? "black" : "white";
+    setReady();
+  }
+}
+
+function redo() {
+  if (boardHistory[turn + 1]) {
+    turn++;
+    state = JSON.parse(boardHistory[turn]);
+    setFigures();
+    activePlayer = activePlayer == "white" ? "black" : "white";
+    setReady();
+  }
+}
+
+document.body.onkeydown = (e) => {
+  if (e.key == "Z" && e.ctrlKey && e.shiftKey) redo();
+  else if (e.key == "z" && e.ctrlKey) undo();
+};
 
 // function fill(i, hue) {
 //   i = ((i - 1) % 36) + 1;
