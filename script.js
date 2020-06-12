@@ -8,16 +8,16 @@ const figures = {
 };
 board
   .querySelectorAll("td")
-  .forEach((cell) => (cell.onclick = () => setActive(cell)));
+  .forEach((cell) => (cell.onclick = () => handleClick(cell)));
 document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
 let state = [];
-const startPos = "1NBK1BNR/R7/4Q3/8/3n4/8/8/rnbkqbnr";
+const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 // const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
-let turn = 0 ? "white" : "black";
+let turn = 1 ? "white" : "black";
 setReady();
 
 function formState(posStr) {
@@ -68,8 +68,8 @@ function setFigures() {
 
 function setReady() {
   board
-    .querySelectorAll(".ready, .active")
-    .forEach((cell) => cell.classList.remove("ready", "active"));
+    .querySelectorAll(".ready, .active, .move")
+    .forEach((cell) => cell.classList.remove("ready", "active", "move"));
   state.forEach((row, i) =>
     row.forEach((figure, j) => {
       if (figure?.color == turn) {
@@ -80,12 +80,19 @@ function setReady() {
 }
 
 function setActive(cell) {
-  if (cell.classList.contains("ready")) {
-    board
-      .querySelectorAll(".move, .active")
-      .forEach((cell) => cell.classList.remove("move", "active"));
-    cell.classList.add("active");
-    getMoves(cell).forEach((cell) => cell.classList.add("move"));
+  board
+    .querySelectorAll(".move, .active")
+    .forEach((cell) => cell.classList.remove("move", "active"));
+  cell.classList.add("active");
+  getMoves(cell).forEach((cell) => cell.classList.add("move"));
+}
+
+function handleClick(cell) {
+  if (cell.classList.contains("ready")) setActive(cell);
+  else if (cell.classList.contains("move")) {
+    moveFigure(board.querySelector(".active"), cell);
+    turn = turn == "white" ? "black" : "white";
+    setReady();
   }
 }
 
@@ -95,11 +102,23 @@ function getFigure(cell) {
   return state[row][col];
 }
 
+function putFigure(cell, figure) {
+  const col = cell.cellIndex - 1;
+  const row = cell.rowIndex - 1;
+  state[row][col] = figure;
+}
+
 function getMoves(cell) {
   const figure = getFigure(cell);
   return [...board.querySelectorAll("td")].filter((td) =>
     canMoveThere(figure, cell, td)
   );
+}
+
+function moveFigure(from, to) {
+  putFigure(to, getFigure(from));
+  putFigure(from, null);
+  setFigures();
 }
 
 function canMoveThere(figure, from, to) {
