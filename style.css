@@ -132,3 +132,10 @@ td {
   top: 20%;
   left: 47.5%;
 }
+
+@media (max-width: 575px) {
+  .btns {
+    top: 91%;
+    left: 41%;
+  }
+}
