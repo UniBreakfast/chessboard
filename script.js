@@ -74,7 +74,7 @@ function setReady() {
     .forEach((cell) => cell.classList.remove("ready", "active", "move"));
   state.forEach((row, i) =>
     row.forEach((figure, j) => {
-      if (figure?.color == activePlayer) {
+      if (figure?color == activePlayer) {
         board.rows[i].cells[j + 1].classList.add("ready");
       }
     })
