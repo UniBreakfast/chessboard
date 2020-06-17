@@ -6,9 +6,8 @@ const figures = {
   queen: { empty: "♕", filled: "♛" },
   pawn: { empty: "♙", filled: "♟" },
 };
-board
-  .querySelectorAll("td")
-  .forEach((cell) => (cell.onclick = () => handleClick(cell)));
+const cells = [...board.querySelectorAll("td")];
+cells.forEach((cell) => (cell.onclick = () => handleClick(cell)));
 document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
@@ -86,17 +85,19 @@ function setActive(cell) {
     .querySelectorAll(".move, .active")
     .forEach((cell) => cell.classList.remove("move", "active"));
   cell.classList.add("active");
-  getMoves(cell).forEach((cell) => cell.classList.add("move"));
+  const moves = getMoves(cell);
+  if (!moves.length) alert("Check, mate");
+  moves.forEach((cell) => cell.classList.add("move"));
 }
 
 function handleClick(cell) {
   if (cell.classList.contains("ready")) setActive(cell);
   else if (cell.classList.contains("move")) {
     moveFigure(board.querySelector(".active"), cell);
+    boardHistory.length = ++turn;
     boardHistory.push(JSON.stringify(state));
     activePlayer = activePlayer == "white" ? "black" : "white";
     setReady();
-    turn++;
   }
 }
 
@@ -114,8 +115,8 @@ function putFigure(cell, figure) {
 
 function getMoves(cell) {
   const figure = getFigure(cell);
-  return [...board.querySelectorAll("td")].filter((td) =>
-    canMoveThere(figure, cell, td)
+  return cells.filter(
+    (td) => canMoveThere(figure, cell, td) && !cantMoveThere(figure, cell, td)
   );
 }
 
@@ -123,6 +124,21 @@ function moveFigure(from, to) {
   putFigure(to, getFigure(from));
   putFigure(from, null);
   setFigures();
+}
+
+function cantMoveThere(figure, from, to) {
+  const tempState = JSON.stringify(state);
+  putFigure(to, getFigure(from));
+  putFigure(from, null);
+  const kingCell = cells.find((cell) => {
+    const cellFigure = getFigure(cell);
+    return figure.color == cellFigure?.color && cellFigure?.name == "king";
+  });
+  const cant = cells.some(
+    (cell) => getFigure(cell) && canMoveThere(getFigure(cell), cell, kingCell)
+  );
+  state = JSON.parse(tempState);
+  return cant;
 }
 
 function canMoveThere(figure, from, to) {
