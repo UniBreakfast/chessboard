@@ -71,13 +71,28 @@ function setReady() {
   board
     .querySelectorAll(".ready, .active, .move")
     .forEach((cell) => cell.classList.remove("ready", "active", "move"));
+  let turnsAvailable;
   state.forEach((row, i) =>
     row.forEach((figure, j) => {
       if (figure?.color == activePlayer) {
-        board.rows[i].cells[j + 1].classList.add("ready");
+        const cell = board.rows[i].cells[j + 1];
+        if (getMoves(cell).length) {
+          cell.classList.add("ready");
+          turnsAvailable = true;
+        }
       }
     })
   );
+  if (!turnsAvailable)
+    setTimeout(
+      () =>
+        alert(
+          `Check, mate! ${
+            activePlayer == "white" ? "Black" : "White"
+          } player wins!`
+        ),
+      500
+    );
 }
 
 function setActive(cell) {
@@ -86,7 +101,6 @@ function setActive(cell) {
     .forEach((cell) => cell.classList.remove("move", "active"));
   cell.classList.add("active");
   const moves = getMoves(cell);
-  if (!moves.length) alert("Check, mate");
   moves.forEach((cell) => cell.classList.add("move"));
 }
 
@@ -127,7 +141,7 @@ function moveFigure(from, to) {
 }
 
 function cantMoveThere(figure, from, to) {
-  const tempState = JSON.stringify(state);
+  const tempState = JSON.parse(JSON.stringify(state));
   putFigure(to, getFigure(from));
   putFigure(from, null);
   const kingCell = cells.find((cell) => {
@@ -137,7 +151,7 @@ function cantMoveThere(figure, from, to) {
   const cant = cells.some(
     (cell) => getFigure(cell) && canMoveThere(getFigure(cell), cell, kingCell)
   );
-  state = JSON.parse(tempState);
+  state.forEach((row, i) => row.splice(0, 8, ...tempState[i]));
   return cant;
 }
 
