@@ -13,7 +13,6 @@ document.body.onclick = (e) => {
 };
 let state = [];
 const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
-// const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
 let activePlayer = 1 ? "white" : "black";
@@ -56,6 +55,12 @@ function setFigure(row, col, figure) {
     var char = figures[figure.name].empty;
   } else char = figures[figure.name].filled;
   board.rows[row].cells[col + 1].innerText = char;
+}
+
+function setFigure(row, col, figure) {
+  board.rows[row].cells[col + 1].style.backgroundImage = !figure
+    ? null
+    : `url("img/icons/${figure.name}_${figure.color}.png")`;
 }
 
 function setFigures() {
