@@ -12,11 +12,13 @@ document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
 let state = [];
-const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
+const startPos = "1NBKQBNR/pPPPPPPP/8/8/8/8/Pppppppp/1nbkqbnr";
+// const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
 let activePlayer = 1 ? "white" : "black";
 let turn = 0;
+let temp;
 const boardHistory = [JSON.stringify(state)];
 setReady();
 
@@ -109,10 +111,10 @@ function setActive(cell) {
   moves.forEach((cell) => cell.classList.add("move"));
 }
 
-function handleClick(cell) {
+async function handleClick(cell) {
   if (cell.classList.contains("ready")) setActive(cell);
   else if (cell.classList.contains("move")) {
-    moveFigure(board.querySelector(".active"), cell);
+    await moveFigure(board.querySelector(".active"), cell);
     boardHistory.length = ++turn;
     boardHistory.push(JSON.stringify(state));
     activePlayer = activePlayer == "white" ? "black" : "white";
@@ -126,10 +128,46 @@ function getFigure(cell) {
   return state[row][col];
 }
 
-function putFigure(cell, figure) {
+// function putFigure(cell, figure) {
+//   const col = cell.cellIndex - 1;
+//   const row = cell.rowIndex - 1;
+//   if (
+//     figure.name == "pawn" &&
+//     ((figure.color == "white" && row == 7) ||
+//       (figure.color == "black" && row == 0))
+//   ) {
+//     figurePicker.dataset.color = figure.color;
+//     selectPromotion().then((figure) => (state[row][col] = figure));
+//   } else state[row][col] = figure;
+// }
+async function putFigure(cell, figure) {
   const col = cell.cellIndex - 1;
   const row = cell.rowIndex - 1;
+  if (
+    !temp &&
+    figure?.name == "pawn" &&
+    ((figure.color == "white" && row == 7) ||
+      (figure.color == "black" && row == 0))
+  ) {
+    figurePicker.dataset.color = figure.color;
+    figure = await selectPromotion();
+  }
   state[row][col] = figure;
+}
+
+function selectPromotion() {
+  glass.hidden = false;
+  return new Promise((resolve, reject) => {
+    figurePicker.onclick = (e) => {
+      if (e.target != figurePicker) {
+        glass.hidden = true;
+        resolve({
+          color: figurePicker.dataset.color,
+          name: e.target.dataset.figure,
+        });
+      }
+    };
+  });
 }
 
 function getMoves(cell) {
@@ -139,14 +177,15 @@ function getMoves(cell) {
   );
 }
 
-function moveFigure(from, to) {
-  putFigure(to, getFigure(from));
+async function moveFigure(from, to) {
+  await putFigure(to, getFigure(from));
   putFigure(from, null);
   setFigures();
 }
 
 function cantMoveThere(figure, from, to) {
   const tempState = JSON.parse(JSON.stringify(state));
+  temp = true;
   putFigure(to, getFigure(from));
   putFigure(from, null);
   const kingCell = cells.find((cell) => {
@@ -157,6 +196,7 @@ function cantMoveThere(figure, from, to) {
     (cell) => getFigure(cell) && canMoveThere(getFigure(cell), cell, kingCell)
   );
   state.forEach((row, i) => row.splice(0, 8, ...tempState[i]));
+  temp = false;
   return cant;
 }
 
