@@ -161,16 +161,29 @@ td {
 }
 
 [data-figure][data-figure] {
+  border: none;
   width: 50px;
   height: 50px;
   background-size: 80%;
   background-repeat: no-repeat;
   background-position: center;
+  cursor: pointer;
+}
+
+[data-figure][data-figure]:hover {
+  background-size: 50px;
+}
+
+[data-figure][data-figure]:focus {
+  border: none;
+  outline: none;
 }
 
 .pick-figure {
+  padding: 15px;
   margin: auto;
   background: url("img/dark-bg.jpg");
+  border: 5px solid #402204;
 }
 
 #glass {

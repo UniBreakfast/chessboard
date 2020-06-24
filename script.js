@@ -12,8 +12,7 @@ document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
 let state = [];
-const startPos = "1NBKQBNR/pPPPPPPP/8/8/8/8/Pppppppp/1nbkqbnr";
-// const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
+const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 formState(startPos);
 setFigures();
 let activePlayer = 1 ? "white" : "black";
@@ -153,6 +152,8 @@ async function putFigure(cell, figure) {
     figure = await selectPromotion();
   }
   state[row][col] = figure;
+  if (!temp && figure && (figure.name == "king" || figure.name == "rook"))
+    figure.moved = true;
 }
 
 function selectPromotion() {
@@ -179,6 +180,18 @@ function getMoves(cell) {
 
 async function moveFigure(from, to) {
   await putFigure(to, getFigure(from));
+  if (getFigure(from).name == "king") {
+    if (from.cellIndex + 2 == to.cellIndex) {
+      putFigure(
+        to.previousElementSibling,
+        getFigure(to.nextElementSibling.nextElementSibling)
+      );
+      putFigure(to.nextElementSibling.nextElementSibling, null);
+    } else if (from.cellIndex - 2 == to.cellIndex) {
+      putFigure(to.nextElementSibling, getFigure(to.previousElementSibling));
+      putFigure(to.previousElementSibling, null);
+    }
+  }
   putFigure(from, null);
   setFigures();
 }
@@ -247,6 +260,26 @@ function canMoveThere(figure, from, to) {
       break;
     case "king":
       if (rows + cols <= 2 && rows != 2 && cols != 2) return true;
+      if (
+        !temp &&
+        !figure.moved &&
+        !cells.some((cell) => {
+          temp = true;
+          const danger =
+            getFigure(cell) && canMoveThere(getFigure(cell), cell, from);
+          temp = false;
+          return danger;
+        }) &&
+        ((to.cellIndex == from.cellIndex + 2 &&
+          getFigure(to.parentElement.cells[8])?.name == "rook" &&
+          !getFigure(to.parentElement.cells[8])?.moved &&
+          isLineFree(from, to.parentElement.cells[8])) ||
+          (to.cellIndex == from.cellIndex - 2 &&
+            getFigure(to.parentElement.cells[1])?.name == "rook" &&
+            !getFigure(to.parentElement.cells[1])?.moved &&
+            isLineFree(from, to.parentElement.cells[1])))
+      )
+        return true;
       break;
     case "queen":
       return isLineFree(from, to);
