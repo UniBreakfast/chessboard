@@ -1,25 +1,43 @@
-const figures = {
-  rook: { empty: "♖", filled: "♜" },
-  knight: { empty: "♘", filled: "♞" },
-  bishop: { empty: "♗", filled: "♝" },
-  king: { empty: "♔", filled: "♚" },
-  queen: { empty: "♕", filled: "♛" },
-  pawn: { empty: "♙", filled: "♟" },
-};
 const cells = [...board.querySelectorAll("td")];
+const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
+let state = [];
+let activePlayer, turn, temp, boardHistory;
+let blackSeconds, whiteSeconds;
+
 cells.forEach((cell) => (cell.onclick = () => handleClick(cell)));
 document.body.onclick = (e) => {
   if (e.target == document.body) setReady();
 };
-let state = [];
-const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
-formState(startPos);
-setFigures();
-let activePlayer = 1 ? "white" : "black";
-let turn = 0;
-let temp;
-const boardHistory = [JSON.stringify(state)];
-setReady();
+timelessStartBtn.onclick = () => {
+  startMenu.hidden = true;
+  startGame();
+  whiteClock.hidden = true;
+  blackClock.hidden = true;
+};
+timedStartBtn.onclick = () => {
+  startMenu.hidden = true;
+  startGame();
+  whiteClock.hidden = false;
+  blackClock.hidden = false;
+  blackSeconds = whiteSeconds = minuteInput.value * 60;
+};
+
+function showTime(seconds, element) {
+  const parts = input.split(":"),
+    min = +parts[0],
+    sec = +parts[1];
+  return Math.floor(min / 60 + sec * 60);
+}
+
+function startGame() {
+  formState(startPos);
+  setFigures();
+  activePlayer = 1 ? "white" : "black";
+  turn = 0;
+  temp = false;
+  boardHistory = [JSON.stringify(state)];
+  setReady();
+}
 
 function formState(posStr) {
   state = [];
