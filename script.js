@@ -2,7 +2,7 @@ const cells = [...board.querySelectorAll("td")];
 const startPos = "RNBKQBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbkqbnr";
 let state = [];
 let activePlayer, turn, temp, boardHistory;
-let blackSeconds, whiteSeconds;
+let blackSeconds, whiteSeconds, clockInterval, timedGame;
 
 cells.forEach((cell) => (cell.onclick = () => handleClick(cell)));
 document.body.onclick = (e) => {
@@ -10,23 +10,63 @@ document.body.onclick = (e) => {
 };
 timelessStartBtn.onclick = () => {
   startMenu.hidden = true;
-  startGame();
   whiteClock.hidden = true;
   blackClock.hidden = true;
+  timedGame = false;
+  startGame();
 };
 timedStartBtn.onclick = () => {
   startMenu.hidden = true;
-  startGame();
   whiteClock.hidden = false;
   blackClock.hidden = false;
+  timedGame = true;
   blackSeconds = whiteSeconds = minuteInput.value * 60;
+  showTime(whiteSeconds, whiteClock);
+  showTime(blackSeconds, blackClock);
+  startGame();
 };
 
+function startClock(clock) {
+  clearInterval(clockInterval);
+  clockInterval = setInterval(() => {
+    if (clock == whiteClock) {
+      whiteSeconds -= 1;
+      showTime(whiteSeconds, whiteClock);
+      if (!whiteSeconds) {
+        clearInterval(clockInterval);
+        setTimeout(() => {
+          alert(`Time's up! Black player wins!`);
+          startMenu.hidden = false;
+        }, 500);
+      }
+    } else {
+      blackSeconds -= 1;
+      showTime(blackSeconds, blackClock);
+      if (!blackSeconds) {
+        clearInterval(clockInterval);
+        setTimeout(() => {
+          alert(`Time's up! White player wins!`);
+          startMenu.hidden = false;
+        }, 500);
+      }
+    }
+  }, 1000);
+}
+
 function showTime(seconds, element) {
-  const parts = input.split(":"),
-    min = +parts[0],
-    sec = +parts[1];
-  return Math.floor(min / 60 + sec * 60);
+  // 200 -> 03:20
+  // 200/60 = 3,...
+  // 60 * 3 = 180
+  // 200 - 180 = 20
+  let minutes = Math.floor(seconds / 60);
+  seconds -= 60 * minutes;
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+  element.innerText = minutes + ":" + seconds;
 }
 
 function startGame() {
@@ -107,16 +147,18 @@ function setReady() {
       }
     })
   );
+  if (timedGame) {
+    startClock(activePlayer == "white" ? whiteClock : blackClock);
+  }
   if (!turnsAvailable)
-    setTimeout(
-      () =>
-        alert(
-          `Check, mate! ${
-            activePlayer == "white" ? "Black" : "White"
-          } player wins!`
-        ),
-      500
-    );
+    setTimeout(() => {
+      alert(
+        `Check, mate! ${
+          activePlayer == "white" ? "Black" : "White"
+        } player wins!`
+      );
+      startMenu.hidden = false;
+    }, 500);
 }
 
 function setActive(cell) {

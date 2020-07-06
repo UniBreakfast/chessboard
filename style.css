@@ -118,7 +118,8 @@ td {
 }
 
 .btn:hover {
-  padding: 23px;
+  /* padding: 23px; */
+  transform: scale(1.1);
   border-radius: 50px;
   box-shadow: 0px 0px 20px 10px gold;
 }
@@ -207,6 +208,8 @@ td {
 .clock {
   text-align: center;
   font-size: 30px;
+  font-family: monospace;
+  font-weight: 700;
 }
 
 #startMenu {
