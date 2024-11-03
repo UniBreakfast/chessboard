@@ -1,4 +1,4 @@
-# chessboard
+# [chessboard](https://github.com/UniBreakfast/chessboard)
 
 ## A game of Chess for two players
 
